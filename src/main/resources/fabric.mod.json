@@ -26,6 +26,9 @@
         ],
         "modmenu": [
           "net.kown.talkershighligth.ModMenuApiImpl"
+        ],
+        "voicechat": [
+          "net.kown.talkershighligth.bridge.VoiceChatPluginV1"
         ]
 	},
 	"mixins": [
