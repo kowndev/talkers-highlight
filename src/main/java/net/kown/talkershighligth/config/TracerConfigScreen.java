@@ -1,0 +1,153 @@
+package net.kown.talkershighligth.config;
+
+import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.controller.*;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
+
+import java.awt.Color;
+
+/**
+ * Builds the YACL-powered settings screen.
+ *
+ * <p>Called both from the in-game keybind ({@code K}) and, if Mod Menu is
+ * installed, from its "Config" button.
+ */
+public final class TracerConfigScreen {
+
+    private TracerConfigScreen() {}
+
+    /**
+     * Creates and returns the config screen.
+     *
+     * @param parent  The screen to return to when the user closes config.
+     *                May be {@code null} (YACL handles it gracefully).
+     */
+    public static Screen createScreen(Screen parent) {
+        TracerConfig cfg = TracerConfig.INSTANCE;
+
+        return YetAnotherConfigLib.createBuilder()
+                .title(Text.literal("VoiceChat Tracer — Settings"))
+
+                // ── Tab 1: General ────────────────────────────────────────────
+                .category(ConfigCategory.createBuilder()
+                        .name(Text.literal("General"))
+                        .tooltip(Text.literal("Master switch and identification."))
+
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.literal("Enable Tracer"))
+                                .description(OptionDescription.of(
+                                        Text.literal("Toggle the entire tracer overlay on or off.\n"
+                                                + "You can also press the Toggle keybind (default: J) in-game.")))
+                                .binding(true, () -> cfg.enabled, v -> cfg.enabled = v)
+                                .controller(TickBoxControllerBuilder::create)
+                                .build())
+
+                        .build())
+
+                // ── Tab 2: Activation ─────────────────────────────────────────
+                .category(ConfigCategory.createBuilder()
+                        .name(Text.literal("Activation"))
+                        .tooltip(Text.literal("When tracers appear and how long they linger."))
+
+                        .option(Option.<Float>createBuilder()
+                                .name(Text.literal("Minimum Volume Threshold"))
+                                .description(OptionDescription.of(Text.literal(
+                                        "Normalised amplitude [0.00 – 1.00] that must be exceeded before\n"
+                                                + "a tracer is drawn.  Raise this to suppress open-mic noise.")))
+                                .binding(0.05f, () -> cfg.minVolume, v -> cfg.minVolume = v)
+                                .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                        .range(0.00f, 1.00f)
+                                        .step(0.01f)
+                                        .formatValue(v -> Text.literal(String.format("%.2f", v))))
+                                .build())
+
+                        .option(Option.<Integer>createBuilder()
+                                .name(Text.literal("Tracer Persist Time"))
+                                .description(OptionDescription.of(Text.literal(
+                                        "How long (milliseconds) a tracer remains visible after the last\n"
+                                                + "audio packet is received.  Higher values look smoother for\n"
+                                                + "voice-activation (push-to-talk gaps).")))
+                                .binding(2000, () -> cfg.tracerPersistMs, v -> cfg.tracerPersistMs = v)
+                                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                        .range(100, 10_000)
+                                        .step(100)
+                                        .formatValue(v -> Text.literal(v + " ms")))
+                                .build())
+
+                        .build())
+
+                // ── Tab 3: Appearance ─────────────────────────────────────────
+                .category(ConfigCategory.createBuilder()
+                        .name(Text.literal("Appearance"))
+                        .tooltip(Text.literal("Line thickness and colour gradient."))
+
+                        .group(OptionGroup.createBuilder()
+                                .name(Text.literal("Line Thickness"))
+                                .description(OptionDescription.of(Text.literal(
+                                        "Thickness of the tracer line in pixels.\n"
+                                                + "Min is used at low volume; Max is used at peak volume.\n"
+                                                + "Note: Many GPU drivers cap hardware line width to 1 px.")))
+
+                                .option(Option.<Float>createBuilder()
+                                        .name(Text.literal("Min Thickness"))
+                                        .binding(1.0f, () -> cfg.minLineWidth, v -> cfg.minLineWidth = v)
+                                        .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                                .range(0.5f, 10.0f)
+                                                .step(0.5f)
+                                                .formatValue(v -> Text.literal(String.format("%.1f px", v))))
+                                        .build())
+
+                                .option(Option.<Float>createBuilder()
+                                        .name(Text.literal("Max Thickness"))
+                                        .binding(3.5f, () -> cfg.maxLineWidth, v -> cfg.maxLineWidth = v)
+                                        .controller(opt -> FloatSliderControllerBuilder.create(opt)
+                                                .range(0.5f, 10.0f)
+                                                .step(0.5f)
+                                                .formatValue(v -> Text.literal(String.format("%.1f px", v))))
+                                        .build())
+
+                                .build())
+
+                        .group(OptionGroup.createBuilder()
+                                .name(Text.literal("Colour Gradient"))
+                                .description(OptionDescription.of(Text.literal(
+                                        "The tracer colour lerps from Low → High based on the\n"
+                                                + "player's smoothed amplitude.  Alpha is respected.")))
+
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.literal("Low Volume Colour"))
+                                        .description(OptionDescription.of(Text.literal(
+                                                "Colour shown when the player is just barely above the\n"
+                                                        + "minimum volume threshold (quiet speech).\n"
+                                                        + "Default: semi-transparent green.")))
+                                        .binding(
+                                                new Color(0, 230, 0, 220),
+                                                cfg::getLowVolumeColor,
+                                                v -> cfg.lowVolumeColor = v.getRGB())
+                                        .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
+                                        .build())
+
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.literal("High Volume Colour"))
+                                        .description(OptionDescription.of(Text.literal(
+                                                "Colour shown when the player is speaking loudly / at peak\n"
+                                                        + "amplitude.\n"
+                                                        + "Default: semi-transparent red.")))
+                                        .binding(
+                                                new Color(230, 0, 0, 220),
+                                                cfg::getHighVolumeColor,
+                                                v -> cfg.highVolumeColor = v.getRGB())
+                                        .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
+                                        .build())
+
+                                .build())
+
+                        .build())
+
+                // Persist to disk when the screen is closed.
+                .save(TracerConfig::save)
+                .build()
+                .generateScreen(parent);
+    }
+}

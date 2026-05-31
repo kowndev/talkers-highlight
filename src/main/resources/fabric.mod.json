@@ -1,0 +1,42 @@
+{
+	"schemaVersion": 1,
+	"id": "talkershighligth",
+	"version": "${version}",
+	"name": "Talker's Highligth",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"KownDev"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/talkershighligth/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"net.kown.talkershighligth.TalkersHighligth"
+		],
+		"fabric-datagen": [
+			"net.kown.talkershighligth.TalkersHighligthDataGenerator"
+		],
+        "client": [
+          "net.kown.talkershighligth.TalkersHighlightClient"
+        ],
+        "modmenu": [
+          "net.kown.talkershighligth.ModMenuApiImpl"
+        ]
+	},
+	"mixins": [
+		"talkershighligth.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*",
+        "voicechat": ">=2.5.0",
+        "yet_another_config_lib_v3": ">=3.6.0"
+	}
+}
