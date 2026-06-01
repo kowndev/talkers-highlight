@@ -35,11 +35,11 @@
 		"talkershighligth.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.19.2",
+		"fabricloader": ">=0.17.2",
 		"minecraft": "~1.21.1",
 		"java": ">=21",
 		"fabric-api": "*",
-        "voicechat": ">=2.5.0",
+        "voicechat": ">=1.21.1-2.5.0",
         "yet_another_config_lib_v3": ">=3.6.0"
 	}
 }
