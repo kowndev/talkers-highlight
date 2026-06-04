@@ -54,7 +54,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // 1. Load persisted config ─────────────────────────────────────────────
         TracerConfig.load();
-        LOGGER.info("[VCT] Config loaded from disk.");
+        LOGGER.info("[TH] Config loaded from disk.");
 
         // 2. Register world-render hook ────────────────────────────────────────
         TracerRenderer.register();
@@ -77,7 +77,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
         // 4. Tick handler ──────────────────────────────────────────────────────
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
 
-        LOGGER.info("[VCT] Initialised. Press J to toggle, K for settings.");
+        LOGGER.info("[TH] Initialised. Press J to toggle, K for settings.");
     }
 
     // ── Per-tick logic ────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
             if (client.player != null) {
                 boolean on = TracerConfig.INSTANCE.enabled;
                 client.player.sendMessage(
-                        Text.literal("[VCT] Tracer " + (on ? "§aEnabled" : "§cDisabled")),
+                        Text.literal("[TH] Tracer " + (on ? "§aEnabled" : "§cDisabled")),
                         /* overlay = */ true
                 );
             }
