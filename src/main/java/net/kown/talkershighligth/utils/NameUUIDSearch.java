@@ -38,7 +38,10 @@ public class NameUUIDSearch {
 
             JsonObject json = JsonParser.parseString(response.toString()).getAsJsonObject();
 
-            return json.get("name").getAsString();
+            if(json.get("name")!=null){
+                return json.get("name").getAsString();
+            }
+                return uuid.toString();
 
         } catch (Exception e) {
             e.printStackTrace();

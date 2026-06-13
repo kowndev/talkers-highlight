@@ -5,15 +5,10 @@ import net.kown.talkershighligth.tracer.TracerManager;
 
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
-import de.maxhenkel.voicechat.api.VoicechatClientApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
 import de.maxhenkel.voicechat.api.events.ClientReceiveSoundEvent;
-import de.maxhenkel.voicechat.api.events.ClientSoundEvent;
-import org.spongepowered.asm.logging.ILogger;
 
 import java.util.UUID;
-
-import net.kown.talkershighligth.utils.NameUUIDSearch;
 
 public class VoiceChatPluginV1 implements VoicechatPlugin{
     @Override
@@ -64,9 +59,7 @@ public class VoiceChatPluginV1 implements VoicechatPlugin{
         try {
 
             // ── Pattern A – SVC 2.5.x (most common) ──────────────────────────
-            //return event.getId();
-            UUID x = event.getId();
-            TalkersHighlightClient.LOGGER.warn("[THD] {} is speaking", NameUUIDSearch.id(x));
+            return event.getId();
 
             // ── Pattern B – some older 2.4.x builds ──────────────────────────
             //return event.getConnection().getPlayer().getId();
@@ -75,7 +68,6 @@ public class VoiceChatPluginV1 implements VoicechatPlugin{
             // ── Pattern C – alternative naming ───────────────────────────────
             // return event.getPlayer().getUUID();
 
-            return x;
         } catch (Exception ignored) {
             // API mismatch — try the next pattern.
             return null;
@@ -122,7 +114,7 @@ public class VoiceChatPluginV1 implements VoicechatPlugin{
         // Apply perceptual curve
         normalized = Math.sqrt(normalized);
 
-        TalkersHighlightClient.LOGGER.warn("[THD] RMS: {}", rms);
+        //TalkersHighlightClient.LOGGER.warn("[THD] RMS: {}", rms);
         return (float) Math.max(0.0, Math.min(1.0, normalized));
     }
 }

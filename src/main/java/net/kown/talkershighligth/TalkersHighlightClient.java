@@ -20,6 +20,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.mojang.brigadier.Command;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import net.kown.talkershighligth.utils.DebugState;
+
 /**
  * Client-side initialisation entry point.
  *
@@ -58,6 +63,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // 2. Register world-render hook ────────────────────────────────────────
         TracerRenderer.register();
+        registerCommands();
 
         // 3. Register keybindings ─────────────────────────────────────────────
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -119,5 +125,26 @@ public class TalkersHighlightClient implements ClientModInitializer {
                 client.setScreen(TracerConfigScreen.createScreen(null));
             }
         }
+    }
+
+    public static void registerCommands() {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
+                    literal("thdebug")
+                            .executes(ctx -> {
+
+                                DebugState.enabled = !DebugState.enabled;
+
+                                ctx.getSource().sendFeedback(
+                                        net.minecraft.text.Text.literal(
+                                                "[THD] Test: "
+                                                        + (DebugState.enabled ? "ON" : "OFF")
+                                        )
+                                );
+
+                                return Command.SINGLE_SUCCESS;
+                            })
+            );
+        });
     }
 }
