@@ -60,12 +60,8 @@ public final class TracerRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        int i = 1;
         for (TracerEntry entry : entries) {
             UUID playerUUID = entry.getPlayerUUID();
-
-//            TalkersHighlightClient.LOGGER.warn("[THD]TracerRenderer.renderTracers is called, {}/{}",
-//                    i++, entries.size());
 
             if (playerUUID.equals(client.player.getUuid())) continue;
 
@@ -93,9 +89,6 @@ public final class TracerRenderer {
 
             float[] c = lerpColor(config, amplitude);
             float lineWidth = lerpF(config.minLineWidth, config.maxLineWidth, amplitude);
-
-//            TalkersHighlightClient.LOGGER.warn("[THD]lineWidth {}", lineWidth);
-//            TalkersHighlightClient.LOGGER.warn("[THD]player loc {}X {}Y {}Z", toX, toY, toZ);
 
             RenderSystem.lineWidth(lineWidth);
 
