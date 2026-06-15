@@ -7,6 +7,8 @@ import net.kown.talkershighligth.tracer.TracerManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.kown.talkershighligth.utils.DebugPing;
+import net.kown.talkershighligth.utils.DebugPingRandom;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
@@ -20,10 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.mojang.brigadier.Command;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
-import net.kown.talkershighligth.utils.DebugState;
 
 /**
  * Client-side initialisation entry point.
@@ -129,22 +128,8 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
     public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(
-                    literal("thdebug")
-                            .executes(ctx -> {
-
-                                DebugState.enabled = !DebugState.enabled;
-
-                                ctx.getSource().sendFeedback(
-                                        net.minecraft.text.Text.literal(
-                                                "[THD] Test: "
-                                                        + (DebugState.enabled ? "ON" : "OFF")
-                                        )
-                                );
-
-                                return Command.SINGLE_SUCCESS;
-                            })
-            );
+            DebugPing.register(dispatcher);
+            DebugPingRandom.register(dispatcher);
         });
     }
 }

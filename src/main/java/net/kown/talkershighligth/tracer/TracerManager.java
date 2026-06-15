@@ -22,7 +22,7 @@ public final class TracerManager {
     public static final TracerManager INSTANCE = new TracerManager();
 
     /** UUID → active tracer.  May be written from the audio thread. */
-    private final ConcurrentHashMap<UUID, TracerEntry> tracers = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, TracerEntry> tracers = new ConcurrentHashMap<>();
 
     private TracerManager() {}
 
@@ -35,7 +35,7 @@ public final class TracerManager {
      * @param amplitude   Normalised amplitude [0.0 – 1.0].
      *                    Use {@code 1.0f} if SVC does not expose raw amplitude.
      */
-    public void onPlayerTalking(UUID playerUUID, float amplitude) {
+    public static void onPlayerTalking(UUID playerUUID, float amplitude) {
         TracerConfig cfg = TracerConfig.INSTANCE;
         if (!cfg.enabled)             return;
         if (amplitude < cfg.minVolume) return;

@@ -19,8 +19,6 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.UUID;
 
-import net.kown.talkershighligth.utils.DebugState;
-
 public final class TracerRenderer {
 
     private TracerRenderer() {}
@@ -45,15 +43,33 @@ public final class TracerRenderer {
         if (matrices == null) return;
 
         Camera camera = ctx.camera();
-        Vec3d camPos  = camera.getPos();
+        Vec3d camPos = camera.getPos();
+
+        // ── NEW: compute the crosshair "look" direction from the camera rotation ──
+        float yaw   = camera.getYaw();
+        float pitch = camera.getPitch();
+
+        double yawRad   = Math.toRadians(yaw);
+        double pitchRad = Math.toRadians(pitch);
+
+        // Minecraft's yaw: 0° = south (+Z), 90° = west (-X), etc.
+        float lookX = (float)(-Math.sin(yawRad) * Math.cos(pitchRad));
+        float lookY = (float)(-Math.sin(pitchRad));
+        float lookZ = (float)( Math.cos(yawRad) * Math.cos(pitchRad));
+
+        // Place the line start a small distance in front of the camera along the look ray.
+        // This anchors it visually to the crosshair.
+        float nearDist = 0.25f; // tweak if needed
+        float startX = lookX * nearDist;
+        float startY = lookY * nearDist;
+        float startZ = lookZ * nearDist;
+        // ─────────────────────────────────────────────────────────────────────────
 
         VertexConsumerProvider.Immediate provider =
                 (VertexConsumerProvider.Immediate) ctx.consumers();
         if (provider == null) return;
 
         matrices.push();
-        // Translate so world-space coordinates work correctly for target vertices.
-        // After this, (0, 0, 0) is exactly the camera eye position.
         matrices.translate(-camPos.x, -camPos.y, -camPos.z);
 
         RenderSystem.disableDepthTest();
@@ -70,14 +86,11 @@ public final class TracerRenderer {
 
             float amplitude = entry.getSmoothedAmplitude();
 
-//            TalkersHighlightClient.LOGGER.warn("[THD]player: {},amp: {}",
-//                    NameUUIDSearch.id(playerUUID), amplitude);
-
             double toX = player.getX();
             double toY = player.getY() + player.getHeight() * 0.5;
             double toZ = player.getZ();
 
-            // Normal vector: from camera origin (0,0,0) toward the target in world-space.
+            // Direction from camera to target (for the normal)
             double dx = toX - camPos.x;
             double dy = toY - camPos.y;
             double dz = toZ - camPos.z;
@@ -94,10 +107,12 @@ public final class TracerRenderer {
 
             VertexConsumer lines = provider.getBuffer(RenderLayer.LINES);
 
-            // Origin is (0, 0, 0) — the camera eye in translated space.
-            lines.vertex(matrices.peek().getPositionMatrix(), 0f, 0f, 0f)
+            // ── CHANGED: start vertex is now along the crosshair look ray ──
+            lines.vertex(matrices.peek().getPositionMatrix(),
+                            startX + (float)camPos.x, startY + (float)camPos.y, startZ + (float)camPos.z)
                     .color(c[0], c[1], c[2], c[3])
                     .normal(matrices.peek(), nx, ny, nz);
+            // ───────────────────────────────────────────────────────────────
 
             lines.vertex(matrices.peek().getPositionMatrix(),
                             (float) toX, (float) toY, (float) toZ)
