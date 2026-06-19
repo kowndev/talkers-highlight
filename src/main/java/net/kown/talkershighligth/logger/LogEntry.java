@@ -9,4 +9,4 @@ import java.util.UUID;
  * @param uuid  Player UUID; used as the unique key for de-duplication.
  * @param value The numeric value collected from the other code segment.
  */
-public record LogEntry(long time, UUID uuid, double value) {}
+public record LogEntry(long time, UUID uuid, float value) {}

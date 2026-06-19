@@ -63,7 +63,7 @@ public final class LoggerManager {
      * Time is stamped at the moment of receipt. No username lookup happens
      * here - that's deferred until display/log time.
      */
-    public static synchronized void addEntry(UUID uuid, double value) {
+    public static synchronized void addEntry(UUID uuid, float value) {
         LogEntry entry = new LogEntry(System.currentTimeMillis(), uuid, value);
         updateRecentTable(entry);
         updateHighestTable(entry);
