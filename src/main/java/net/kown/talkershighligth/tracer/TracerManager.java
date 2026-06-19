@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static net.kown.talkershighligth.logger.LoggerManager.addEntry;
+
 /**
  * Central registry of active tracer entries.
  *
@@ -42,6 +44,7 @@ public final class TracerManager {
 
         tracers.compute(playerUUID, (uuid, existing) -> {
             if (existing == null) {
+                addEntry(uuid, amplitude);
                 return new TracerEntry(uuid, amplitude);
             }
             existing.onSoundReceived(amplitude);
