@@ -1,14 +1,12 @@
 package net.kown.talkershighligth.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.kown.talkershighligth.TalkersHighlightClient;
-import net.kown.talkershighligth.config.TracerConfig;
+import net.kown.talkershighligth.config.Config;
 import net.kown.talkershighligth.tracer.TracerEntry;
 import net.kown.talkershighligth.tracer.TracerManager;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 
-import net.kown.talkershighligth.utils.NameUUIDSearch;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.*;
@@ -33,8 +31,8 @@ public final class TracerRenderer {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.world == null || client.player == null) return;
 
-        TracerConfig config = TracerConfig.INSTANCE;
-        if (!config.enabled) return;
+        Config config = Config.INSTANCE;
+        if (!config.TracerEnabled) return;
 
         Collection<TracerEntry> entries = TracerManager.INSTANCE.getActiveTracers();
         if (entries.isEmpty()) return;
@@ -136,7 +134,7 @@ public final class TracerRenderer {
         return null;
     }
 
-    private static float[] lerpColor(TracerConfig cfg, float t) {
+    private static float[] lerpColor(Config cfg, float t) {
         t = Math.max(0f, Math.min(1f, t));
         Color lo = cfg.getLowVolumeColor();
         Color hi = cfg.getHighVolumeColor();

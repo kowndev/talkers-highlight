@@ -17,10 +17,10 @@ import java.nio.file.Path;
  * Use {@link #getLowVolumeColor()} / {@link #getHighVolumeColor()} to get
  * {@link java.awt.Color} objects for rendering.
  */
-public class TracerConfig {
+public class Config {
 
     // ── Singleton ─────────────────────────────────────────────────────────────
-    public static TracerConfig INSTANCE = new TracerConfig();
+    public static Config INSTANCE = new Config();
 
     private static final Logger LOGGER = LoggerFactory.getLogger("talkershighligth/config");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -28,8 +28,9 @@ public class TracerConfig {
             FabricLoader.getInstance().getConfigDir().resolve("talkershighligth.json");
 
     // ── General ───────────────────────────────────────────────────────────────
-    /** Master on/off switch for the tracer overlay. */
-    public boolean enabled = true;
+    /** Master on/off switch for the overlay. */
+    public boolean TracerEnabled = true;
+    public boolean HighlightEnabled = false;
 
     // ── Activation thresholds ─────────────────────────────────────────────────
     /**
@@ -64,6 +65,13 @@ public class TracerConfig {
      */
     public int highVolumeColor = new Color(230, 0, 0, 220).getRGB();
 
+    /**
+     * Logger list size
+     * Logger auto save interval
+     */
+    public int listSize = 10;
+    public int autosaveIntervalSeconds = 30;
+
     // ── Helpers ───────────────────────────────────────────────────────────────
     public Color getLowVolumeColor()  { return new Color(lowVolumeColor,  true); }
     public Color getHighVolumeColor() { return new Color(highVolumeColor, true); }
@@ -71,17 +79,17 @@ public class TracerConfig {
     // ── Persistence ───────────────────────────────────────────────────────────
     public static void load() {
         if (!Files.exists(CONFIG_FILE)) {
-            INSTANCE = new TracerConfig();
+            INSTANCE = new Config();
             save();
             return;
         }
         try {
             String json = Files.readString(CONFIG_FILE);
-            TracerConfig loaded = GSON.fromJson(json, TracerConfig.class);
-            INSTANCE = (loaded != null) ? loaded : new TracerConfig();
+            Config loaded = GSON.fromJson(json, Config.class);
+            INSTANCE = (loaded != null) ? loaded : new Config();
         } catch (IOException | com.google.gson.JsonParseException e) {
-            LOGGER.warn("[VCT] Failed to load config, using defaults.", e);
-            INSTANCE = new TracerConfig();
+            LOGGER.warn("[TH] Failed to load config, using defaults.", e);
+            INSTANCE = new Config();
         }
     }
 
@@ -90,7 +98,7 @@ public class TracerConfig {
             Files.createDirectories(CONFIG_FILE.getParent());
             Files.writeString(CONFIG_FILE, GSON.toJson(INSTANCE));
         } catch (IOException e) {
-            LOGGER.error("[VCT] Failed to save config.", e);
+            LOGGER.error("[TH] Failed to save config.", e);
         }
     }
 }

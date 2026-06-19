@@ -1,6 +1,6 @@
 package net.kown.talkershighligth.tracer;
 
-import net.kown.talkershighligth.config.TracerConfig;
+import net.kown.talkershighligth.config.Config;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +36,8 @@ public final class TracerManager {
      *                    Use {@code 1.0f} if SVC does not expose raw amplitude.
      */
     public static void onPlayerTalking(UUID playerUUID, float amplitude) {
-        TracerConfig cfg = TracerConfig.INSTANCE;
-        if (!cfg.enabled)             return;
+        Config cfg = Config.INSTANCE;
+        if (!cfg.TracerEnabled)             return;
         if (amplitude < cfg.minVolume) return;
 
         tracers.compute(playerUUID, (uuid, existing) -> {
@@ -62,7 +62,7 @@ public final class TracerManager {
      * @param onlineUUIDs  Set of UUIDs currently loaded in the client world.
      */
     public void tick(Set<UUID> onlineUUIDs) {
-        int persistMs = TracerConfig.INSTANCE.tracerPersistMs;
+        int persistMs = Config.INSTANCE.tracerPersistMs;
 
         tracers.entrySet().removeIf(e -> {
             UUID uuid = e.getKey();

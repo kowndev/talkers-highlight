@@ -2,7 +2,7 @@ package net.kown.talkershighligth;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import net.kown.talkershighligth.config.TracerConfigScreen;
+import net.kown.talkershighligth.config.ConfigScreen;
 
 /**
  * Provides a "Config" button in Mod Menu.
@@ -14,6 +14,6 @@ public final class ModMenuApiImpl implements ModMenuApi {
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return TracerConfigScreen::createScreen;
+        return ConfigScreen::createScreen;
     }
 }

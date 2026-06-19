@@ -13,9 +13,9 @@ import java.awt.Color;
  * <p>Called both from the in-game keybind ({@code K}) and, if Mod Menu is
  * installed, from its "Config" button.
  */
-public final class TracerConfigScreen {
+public final class ConfigScreen {
 
-    private TracerConfigScreen() {}
+    private ConfigScreen() {}
 
     /**
      * Creates and returns the config screen.
@@ -24,7 +24,7 @@ public final class TracerConfigScreen {
      *                May be {@code null} (YACL handles it gracefully).
      */
     public static Screen createScreen(Screen parent) {
-        TracerConfig cfg = TracerConfig.INSTANCE;
+        Config cfg = Config.INSTANCE;
 
         return YetAnotherConfigLib.createBuilder()
                 .title(Text.literal("VoiceChat Tracer — Settings"))
@@ -39,8 +39,31 @@ public final class TracerConfigScreen {
                                 .description(OptionDescription.of(
                                         Text.literal("Toggle the entire tracer overlay on or off.\n"
                                                 + "You can also press the Toggle keybind (default: J) in-game.")))
-                                .binding(true, () -> cfg.enabled, v -> cfg.enabled = v)
+                                .binding(true, () -> cfg.TracerEnabled, v -> cfg.TracerEnabled = v)
                                 .controller(TickBoxControllerBuilder::create)
+                                .build())
+
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.literal("Enable Highlighter (maybe)"))
+                                .description(OptionDescription.of(
+                                        Text.literal("Toggle the entire Highlight overlay on or off.")))
+                                .binding(false, () -> cfg.HighlightEnabled, v -> cfg.HighlightEnabled = v)
+                                .controller(TickBoxControllerBuilder::create)
+                                .build())
+
+                        .option(Option.<Integer>createBuilder()
+                                .name(Text.literal("Stored Entries"))
+                                .description(OptionDescription.of(
+                                        Text.literal("Maximum number of entries kept in memory and written to the log on exit.")))
+                                .binding(10, () -> cfg.listSize, v -> cfg.listSize = v)
+                                .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 100).step(1))
+                                .build())
+                        .option(Option.<Integer>createBuilder()
+                                .name(Text.literal("Autosave Interval (seconds)"))
+                                .description(OptionDescription.of(
+                                        Text.literal("How often the log file is refreshed during play, in case the client is killed abruptly. Takes effect after a restart.")))
+                                .binding(30, () -> cfg.autosaveIntervalSeconds, v -> cfg.autosaveIntervalSeconds = v)
+                                .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(5, 300).step(5))
                                 .build())
 
                         .build())
@@ -146,7 +169,7 @@ public final class TracerConfigScreen {
                         .build())
 
                 // Persist to disk when the screen is closed.
-                .save(TracerConfig::save)
+                .save(Config::save)
                 .build()
                 .generateScreen(parent);
     }

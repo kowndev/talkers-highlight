@@ -20,6 +20,9 @@ public class NameUUIDSearch {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            connection.setConnectTimeout(3000); // give up after 3s connecting
+            connection.setReadTimeout(3000);    // give up after 3s waiting on response
+
             if (connection.getResponseCode() != 200) {
                 return null;
             }

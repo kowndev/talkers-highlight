@@ -1,7 +1,8 @@
 package net.kown.talkershighligth;
 
-import net.kown.talkershighligth.config.TracerConfig;
-import net.kown.talkershighligth.config.TracerConfigScreen;
+import net.kown.talkershighligth.config.Config;
+import net.kown.talkershighligth.config.ConfigScreen;
+import net.kown.talkershighligth.logger.LoggerManager;
 import net.kown.talkershighligth.render.TracerRenderer;
 import net.kown.talkershighligth.tracer.TracerManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.kown.talkershighligth.utils.DebugPing;
 import net.kown.talkershighligth.utils.DebugPingRandom;
+import net.kown.talkershighligth.utils.LoggerCall;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
@@ -20,6 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -46,6 +51,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
     public static final String MOD_ID = "talkershighlight";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    private static ScheduledExecutorService autosaveExecutor;
 
     /** Default J – toggle tracer overlay on/off. */
     public static KeyBinding toggleKey;
@@ -57,7 +63,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
     public void onInitializeClient() {
 
         // 1. Load persisted config ─────────────────────────────────────────────
-        TracerConfig.load();
+        Config.load();
         LOGGER.info("[TH] Config loaded from disk.");
 
         // 2. Register world-render hook ────────────────────────────────────────
@@ -106,11 +112,11 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // ── Keybind: toggle ───────────────────────────────────────────────────
         while (toggleKey.wasPressed()) {
-            TracerConfig.INSTANCE.enabled = !TracerConfig.INSTANCE.enabled;
-            TracerConfig.save();
+            Config.INSTANCE.TracerEnabled = !Config.INSTANCE.TracerEnabled;
+            Config.save();
 
             if (client.player != null) {
-                boolean on = TracerConfig.INSTANCE.enabled;
+                boolean on = Config.INSTANCE.TracerEnabled;
                 client.player.sendMessage(
                         Text.literal("[TH] Tracer " + (on ? "§aEnabled" : "§cDisabled")),
                         /* overlay = */ true
@@ -121,15 +127,37 @@ public class TalkersHighlightClient implements ClientModInitializer {
         // ── Keybind: config screen ────────────────────────────────────────────
         while (configKey.wasPressed()) {
             if (client.currentScreen == null) {      // don't stack screens
-                client.setScreen(TracerConfigScreen.createScreen(null));
+                client.setScreen(ConfigScreen.createScreen(null));
             }
         }
     }
 
     public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            LoggerCall.register();
+
             DebugPing.register(dispatcher);
             DebugPingRandom.register(dispatcher);
+
         });
+    }
+    private static void startAutosave() {
+        autosaveExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "THLogger-Autosave");
+            t.setDaemon(true); // never blocks JVM exit
+            return t;
+        });
+        Config cfg = Config.INSTANCE;
+        int intervalSeconds = Math.max(1, cfg.autosaveIntervalSeconds);
+        autosaveExecutor.scheduleAtFixedRate(
+                LoggerManager::writeAutosave,
+                intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
+    }
+
+    private static void stopAutosave() {
+        if (autosaveExecutor != null) {
+            autosaveExecutor.shutdownNow();
+            autosaveExecutor = null;
+        }
     }
 }
