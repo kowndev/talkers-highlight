@@ -7,9 +7,17 @@ import net.kown.talkershighligth.render.TracerRenderer;
 import net.kown.talkershighligth.tracer.TracerManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
+
 import net.kown.talkershighligth.utils.DebugPing;
 import net.kown.talkershighligth.utils.DebugPingRandom;
+import net.kown.talkershighligth.utils.HUDoverlay;
 import net.kown.talkershighligth.utils.LoggerCall;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -68,6 +76,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // 2. Register world-render hook ────────────────────────────────────────
         TracerRenderer.register();
+        HUDoverlay.register();
         registerCommands();
 
         // 3. Register keybindings ─────────────────────────────────────────────
@@ -89,6 +98,30 @@ public class TalkersHighlightClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
 
         LOGGER.info("[TH] Initialised. Press J to toggle, K for settings.");
+
+
+        // Prints the *actual* resolved path - check logs/latest.log for this
+        // line if files seem to be missing. This is the directory FabricLoader
+        // believes is the game dir for THIS launch, which can differ from a
+        // global .minecraft folder if you're using a per-instance launcher
+        // (Prism, MultiMC, CurseForge, ATLauncher, Modrinth App, etc).
+        LOGGER.info("[THLogger] Writing logs to: {}",
+                FabricLoader.getInstance().getGameDir().resolve("thlogger").toAbsolutePath());
+
+        startAutosave();
+
+        // 2. Primary final flush: leaving a world/server.
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> LoggerManager.writeFinalLog());
+
+        // 3. Backup: quitting the game itself without ever disconnecting from a world.
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            stopAutosave();
+            LoggerManager.writeFinalLog();
+        });
+
+        // 4. Backup: safe even if it races with #2/#3 since writeFinalLog() is synchronized.
+        Runtime.getRuntime().addShutdownHook(
+                new Thread(LoggerManager::writeFinalLog, "THLogger-ShutdownHook"));
     }
 
     // ── Per-tick logic ────────────────────────────────────────────────────────
@@ -134,7 +167,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
     public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            LoggerCall.register();
+            LoggerCall.register(dispatcher);
 
             DebugPing.register(dispatcher);
             DebugPingRandom.register(dispatcher);

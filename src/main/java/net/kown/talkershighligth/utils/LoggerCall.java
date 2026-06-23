@@ -1,8 +1,8 @@
 package net.kown.talkershighligth.utils;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.kown.talkershighligth.logger.LogEntry;
 import net.kown.talkershighligth.logger.LoggerManager;
@@ -20,20 +20,18 @@ public final class LoggerCall {
 
     private LoggerCall() {}
 
-    public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal("THLogger")
-                        .then(ClientCommandManager.literal("loud")
-                                .executes(ctx -> {
-                                    show(ctx, LoggerManager.getHighestSortedByValueDesc(), "Top Values");
-                                    return 1;
-                                }))
-                        .then(ClientCommandManager.literal("latest")
-                                .executes(ctx -> {
-                                    show(ctx, LoggerManager.getLatestSortedByTimeDesc(), "Most Recent");
-                                    return 1;
-                                }))
-                )
+    public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
+        dispatcher.register(ClientCommandManager.literal("THLogger")
+                .then(ClientCommandManager.literal("loud")
+                        .executes(ctx -> {
+                            show(ctx, LoggerManager.getHighestSortedByValueDesc(), "Loudest");
+                            return 1;
+                        }))
+                .then(ClientCommandManager.literal("latest")
+                        .executes(ctx -> {
+                            show(ctx, LoggerManager.getLatestSortedByTimeDesc(), "Most Recent");
+                            return 1;
+                        }))
         );
     }
 

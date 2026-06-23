@@ -1,11 +1,10 @@
 package net.kown.talkershighligth.logger;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.kown.talkershighligth.config.Config;
-
-import net.fabricmc.loader.api.FabricLoader;
-
-import net.fabricmc.loader.api.FabricLoader;
 import net.kown.talkershighligth.utils.LoggerNameCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +46,7 @@ import java.util.UUID;
  */
 public final class LoggerManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger("THLogger");
     private static final List<LogEntry> recentTable = new ArrayList<>();
     private static final List<LogEntry> highestTable = new ArrayList<>();
 
@@ -54,6 +54,7 @@ public final class LoggerManager {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter FILENAME_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"); // no colons - filesystem safe
+
     static Config cfg = Config.INSTANCE;
 
     private LoggerManager() {}
@@ -153,7 +154,10 @@ public final class LoggerManager {
         List<LogEntry> merged = new ArrayList<>(recentTable.size() + highestTable.size());
         merged.addAll(recentTable);
         merged.addAll(highestTable);
-        if (merged.isEmpty()) return;
+        if (merged.isEmpty()) {
+            LOGGER.info("[THLogger] Skipping write to {} - no entries collected yet.", logFile.toAbsolutePath());
+            return;
+        }
 
         merged.sort(Comparator.comparingLong(LogEntry::time).reversed());
 
@@ -172,8 +176,9 @@ public final class LoggerManager {
                         time, username, e.uuid(), e.value()));
             }
             Files.write(logFile, lines, StandardCharsets.UTF_8);
+            LOGGER.info("[THLogger] Wrote {} entries to {}", merged.size(), logFile.toAbsolutePath());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("[THLogger] Failed to write log to {}", logFile.toAbsolutePath(), ex);
         }
     }
 }

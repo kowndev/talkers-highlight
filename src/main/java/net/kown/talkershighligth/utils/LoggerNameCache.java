@@ -55,7 +55,11 @@ public final class LoggerNameCache {
         executor.submit(() -> {
             try {
                 String name = NameUUIDSearch.id(uuid); // blocking call - fine, we're off-thread
-                cache.put(uuid, (name != null && !name.isBlank()) ? name : uuid.toString());
+                if (name != null && !name.isBlank()) {
+                    cache.put(uuid, name);
+                }
+                // else: leave uncached on failure, so a future call retries
+                // instead of getting permanently stuck on the UUID fallback.
             } finally {
                 inProgress.remove(uuid);
             }
