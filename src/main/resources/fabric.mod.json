@@ -3,15 +3,16 @@
 	"id": "talkershighligth",
 	"version": "${version}",
 	"name": "Talker's Highligth",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Client Side Simple Voice Chat Addon, that make it more clearer who is talking",
 	"authors": [
 		"KownDev"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/kowndev/talkers-highlight",
+        "issues": "https://github.com/kowndev/talkers-highlight/issues"
 	},
-	"license": "CC0-1.0",
+	"license": "CC-BY-ND 4.0",
 	"icon": "assets/talkershighligth/icon.png",
 	"environment": "client",
 	"entrypoints": {
