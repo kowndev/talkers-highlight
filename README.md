@@ -1,8 +1,8 @@
 # Talker's Highlight 
 
-[![Modrinth](https://img.shields.io/badge/Download-Modrinth-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/mod/YOUR_PROJECT_ID)
-[![Downloads](https://img.shields.io/modrinth/dt/YOUR_PROJECT_ID?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/YOUR_PROJECT_ID)
-[![Version](https://img.shields.io/modrinth/v/YOUR_PROJECT_ID?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/YOUR_PROJECT_ID)
+[![Modrinth](https://img.shields.io/badge/Download-Modrinth-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white)](https://modrinth.com/mod/talkers-highlight)
+[![Downloads](https://img.shields.io/modrinth/dt/YOUR_PROJECT_ID?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/talkers-highlight)
+[![Version](https://img.shields.io/modrinth/v/YOUR_PROJECT_ID?style=for-the-badge&logo=modrinth)](https://modrinth.com/mod/talkers-highlight)
 
 > Make active speakers in Simple Voice Chat easier to identify.
 
@@ -74,11 +74,11 @@ Yes. Talker's Highlight is intended to be installed on the client.
 
 Not necessarily. Some servers may consider features such as Tracers or Highlighter to be unfair gameplay advantages. Always check with server staff before use.
 
-## Support the Project 💰
+## Support the Project ☕
 
 Talker's Highlight is developed in my free time. If you'd like to help support future updates, bug fixes, and new features, you can do so through Ko-fi.
 
-☕ Ko-fi: https://ko-fi.com/YOUR_USERNAME
+https://ko-fi.com/YOUR_USERNAME
 
 Thank you to everyone who uses the mod, reports issues, and supports development.
 

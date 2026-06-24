@@ -44,7 +44,7 @@ public final class ConfigScreen {
                                 .build())
 
                         .option(Option.<Boolean>createBuilder()
-                                .name(Text.literal("Enable Highlighter (maybe)"))
+                                .name(Text.literal("Enable Highlighter (soon)"))
                                 .description(OptionDescription.of(
                                         Text.literal("Toggle the entire Highlight overlay on or off.")))
                                 .binding(false, () -> cfg.HighlightEnabled, v -> cfg.HighlightEnabled = v)
