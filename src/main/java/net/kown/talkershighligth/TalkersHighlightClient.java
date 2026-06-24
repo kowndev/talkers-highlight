@@ -15,8 +15,6 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 
-import net.kown.talkershighligth.utils.DebugPing;
-import net.kown.talkershighligth.utils.DebugPingRandom;
 import net.kown.talkershighligth.utils.HUDoverlay;
 import net.kown.talkershighligth.utils.LoggerCall;
 import net.minecraft.client.MinecraftClient;
@@ -168,10 +166,6 @@ public class TalkersHighlightClient implements ClientModInitializer {
     public static void registerCommands() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             LoggerCall.register(dispatcher);
-
-            DebugPing.register(dispatcher);
-            DebugPingRandom.register(dispatcher);
-
         });
     }
     private static void startAutosave() {
