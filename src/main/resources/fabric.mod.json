@@ -9,9 +9,16 @@
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/talkers-highlight",
-		"sources": "https://github.com/kowndev/talkers-highlight",
+		"Ko-fi": "https://ko-fi.com/kowndev",
         "issues": "https://github.com/kowndev/talkers-highlight/issues"
 	},
+    "custom": {
+      "modmenu": {
+        "links": {
+          "modmenu.kofi": "https://ko-fi.com/kowndev"
+        }
+      }
+    },
 	"license": "CC-BY-ND 4.0",
 	"icon": "assets/talkershighligth/icon.png",
 	"environment": "client",
