@@ -76,9 +76,9 @@ Not necessarily. Some servers may consider features such as Tracers or Highlight
 
 ## Support the Project ☕
 
-Talker's Highlight is developed in my free time. If you'd like to help support future updates, bug fixes, and new features, you can do so through Ko-fi.
+Talker's Highlight is developed in my free time. If you'd like to help support future updates, bug fixes, and new features, you can do so through Ko-fi(kowndev).
 
-https://ko-fi.com/kowndev
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U8W12238DY)
 
 Thank you to everyone who uses the mod, reports issues, and supports development.
 
