@@ -26,13 +26,13 @@ Useful for:
 
 Records voice activity events, allowing you to see when players start and stop speaking.
 
-### Highlighter 👓*(Coming Soon)*
+### Highlighter 👓
 
 Adds visual highlighting to active speakers, making them easier to identify at a glance.
 
 ## Requirements📃
 
-* Minecraft **1.21.1**
+* Minecraft **1.21.1** 
 * Fabric Loader
 * Simple Voice Chat
 
@@ -61,6 +61,10 @@ By using this mod, you are responsible for ensuring compliance with the rules of
 ### Is this a standalone mod?
 
 No. Talker's Highlight is an addon for Simple Voice Chat and requires Simple Voice Chat to function.
+
+### Does this mod compatible above version Minecraft 1.21.1?
+
+Untested. This mod is only confirmed to work on Minecraft 1.21.1, and compatibility with newer versions is unknown, feedback and reports are appreciated.
 
 ### Does this modify voice chat behavior?
 

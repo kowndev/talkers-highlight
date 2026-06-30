@@ -1,7 +1,7 @@
 package net.kown.talkershighligth.bridge;
 
 import net.kown.talkershighligth.TalkersHighlightClient;
-import net.kown.talkershighligth.tracer.TracerManager;
+import net.kown.talkershighligth.manage.ActivityManager;
 
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
@@ -33,18 +33,18 @@ public class VoiceChatPluginV1 implements VoicechatPlugin{
     private void onPlayerSound(ClientReceiveSoundEvent event) {
         UUID playerUUID = resolveUUID(event);
         if (playerUUID == null) return;
-        TracerManager.INSTANCE.onPlayerTalking(playerUUID,
+        ActivityManager.INSTANCE.onPlayerTalking(playerUUID,
                 calculateAudioLevel(event.getRawAudio()));
         // ─────────────────────────────────────────────────────────────────────
         // Amplitude placeholder: 1.0f = "definitely talking".
-        // The smoothed decay in TracerEntry will create a natural fade once
+        // The smoothed decay in ActivityEntry will create a natural fade once
         // events stop arriving, giving the impression of a pulsing signal.
         //
         // To use real amplitude (if your SVC build supports it):
         //   float amplitude = event.getAmplitude();          // hypothetical
-        //   TracerManager.INSTANCE.onPlayerTalking(playerUUID, amplitude);
+        //   ActivityManager.INSTANCE.onPlayerTalking(playerUUID, amplitude);
         // ─────────────────────────────────────────────────────────────────────
-        //TracerManager.INSTANCE.onPlayerTalking(playerUUID, 1.0f);
+        //ActivityManager.INSTANCE.onPlayerTalking(playerUUID, 1.0f);
 
     }
 

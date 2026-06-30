@@ -3,8 +3,9 @@ package net.kown.talkershighligth;
 import net.kown.talkershighligth.config.Config;
 import net.kown.talkershighligth.config.ConfigScreen;
 import net.kown.talkershighligth.logger.LoggerManager;
+import net.kown.talkershighligth.render.HighlightRenderer;
 import net.kown.talkershighligth.render.TracerRenderer;
-import net.kown.talkershighligth.tracer.TracerManager;
+import net.kown.talkershighligth.manage.ActivityManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 
@@ -43,7 +44,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
  *   <li>Load config from disk.</li>
  *   <li>Register the world-render hook (tracers).</li>
  *   <li>Register keybindings and their tick handlers.</li>
- *   <li>Drive {@link TracerManager#tick} once per game tick.</li>
+ *   <li>Drive {@link ActivityManager#tick} once per game tick.</li>
  * </ul>
  *
  * <h3>Keybindings (defaults)</h3>
@@ -60,7 +61,8 @@ public class TalkersHighlightClient implements ClientModInitializer {
     private static ScheduledExecutorService autosaveExecutor;
 
     /** Default J – toggle tracer overlay on/off. */
-    public static KeyBinding toggleKey;
+    public static KeyBinding toggleHighlightKey;
+    public static KeyBinding toggleTracerKey;
 
     /** Default K – open YACL config screen. */
     public static KeyBinding configKey;
@@ -74,15 +76,23 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // 2. Register world-render hook ────────────────────────────────────────
         TracerRenderer.register();
+        HighlightRenderer.register();
         HUDoverlay.register();
         registerCommands();
 
         // 3. Register keybindings ─────────────────────────────────────────────
-        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.voicechat_tracer.toggle",
+        toggleTracerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.talkershighligth.toggle_tracer",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_J,
-                "category.voicechat_tracer"
+                "category.talkershighligth"
+        ));
+
+        toggleHighlightKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.talkershighligth.toggle_highlight",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_H,
+                "category.talkershighligth"
         ));
 
         configKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -128,7 +138,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // ── World management ──────────────────────────────────────────────────
         if (client.world == null) {
-            TracerManager.INSTANCE.clear();
+            ActivityManager.INSTANCE.clear();
             return;
         }
 
@@ -139,17 +149,23 @@ public class TalkersHighlightClient implements ClientModInitializer {
                 .collect(Collectors.toSet());
 
         // Decay amplitudes and purge stale / offline tracers.
-        TracerManager.INSTANCE.tick(onlineUUIDs);
+        ActivityManager.INSTANCE.tick(onlineUUIDs);
 
         // ── Keybind: toggle ───────────────────────────────────────────────────
-        while (toggleKey.wasPressed()) {
+        while (toggleTracerKey.wasPressed() || toggleHighlightKey.wasPressed()) {
             Config.INSTANCE.TracerEnabled = !Config.INSTANCE.TracerEnabled;
+            Config.INSTANCE.HighlightEnabled = !Config.INSTANCE.HighlightEnabled;
             Config.save();
 
             if (client.player != null) {
-                boolean on = Config.INSTANCE.TracerEnabled;
+                boolean TracerOn = Config.INSTANCE.TracerEnabled;
                 client.player.sendMessage(
-                        Text.literal("[TH] Tracer " + (on ? "§aEnabled" : "§cDisabled")),
+                        Text.literal("[TH] Tracer " + (TracerOn ? "§aEnabled" : "§cDisabled")),
+                        /* overlay = */ true
+                );
+                boolean HighlightOn = Config.INSTANCE.HighlightEnabled;
+                client.player.sendMessage(
+                        Text.literal("[TH] Highlighter " + (HighlightOn ? "§aEnabled" : "§cDisabled")),
                         /* overlay = */ true
                 );
             }

@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.tracer;
+package net.kown.talkershighligth.manage;
 import java.util.UUID;
 
 /**
@@ -14,7 +14,7 @@ import java.util.UUID;
  *       the persist-timer.</li>
  * </ol>
  */
-public class TracerEntry {
+public class ActivityEntry {
 
     // How quickly the displayed amplitude falls between events (per tick).
     // 0.92 → drops to ~45 % after 10 ticks (0.5 s at 20 TPS).
@@ -37,7 +37,7 @@ public class TracerEntry {
 
     // ── Construction ──────────────────────────────────────────────────────────
 
-    public TracerEntry(UUID playerUUID, float initialAmplitude) {
+    public ActivityEntry(UUID playerUUID, float initialAmplitude) {
         this.playerUUID        = playerUUID;
         this.lastSeen          = System.currentTimeMillis();
         this.smoothedAmplitude = clamp01(initialAmplitude);
@@ -62,7 +62,7 @@ public class TracerEntry {
     }
 
     /**
-     * Called once per game tick by {@link TracerManager#tick}.
+     * Called once per game tick by {@link ActivityManager#tick}.
      * Applies the per-tick amplitude decay so the line fades after the player
      * stops talking.
      */

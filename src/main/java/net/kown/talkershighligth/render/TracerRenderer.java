@@ -2,8 +2,8 @@ package net.kown.talkershighligth.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.kown.talkershighligth.config.Config;
-import net.kown.talkershighligth.tracer.TracerEntry;
-import net.kown.talkershighligth.tracer.TracerManager;
+import net.kown.talkershighligth.manage.ActivityEntry;
+import net.kown.talkershighligth.manage.ActivityManager;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 
@@ -34,7 +34,7 @@ public final class TracerRenderer {
         Config config = Config.INSTANCE;
         if (!config.TracerEnabled) return;
 
-        Collection<TracerEntry> entries = TracerManager.INSTANCE.getActiveTracers();
+        Collection<ActivityEntry> entries = ActivityManager.INSTANCE.getActiveEntries();
         if (entries.isEmpty()) return;
 
         MatrixStack matrices = ctx.matrixStack();
@@ -74,7 +74,7 @@ public final class TracerRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        for (TracerEntry entry : entries) {
+        for (ActivityEntry entry : entries) {
             UUID playerUUID = entry.getPlayerUUID();
 
             if (playerUUID.equals(client.player.getUuid())) continue;

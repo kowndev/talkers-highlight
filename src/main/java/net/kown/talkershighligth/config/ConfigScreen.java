@@ -44,7 +44,7 @@ public final class ConfigScreen {
                                 .build())
 
                         .option(Option.<Boolean>createBuilder()
-                                .name(Text.literal("Enable Highlighter (soon)"))
+                                .name(Text.literal("Enable Highlighter"))
                                 .description(OptionDescription.of(
                                         Text.literal("Toggle the entire Highlight overlay on or off.")))
                                 .binding(false, () -> cfg.HighlightEnabled, v -> cfg.HighlightEnabled = v)
@@ -91,7 +91,7 @@ public final class ConfigScreen {
                                         "How long (milliseconds) a tracer remains visible after the last\n"
                                                 + "audio packet is received.  Higher values look smoother for\n"
                                                 + "voice-activation (push-to-talk gaps).")))
-                                .binding(2000, () -> cfg.tracerPersistMs, v -> cfg.tracerPersistMs = v)
+                                .binding(2000, () -> cfg.PersistanceMs, v -> cfg.PersistanceMs = v)
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
                                         .range(100, 10_000)
                                         .step(100)

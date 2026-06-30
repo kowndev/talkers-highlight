@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.tracer;
+package net.kown.talkershighligth.manage;
 
 import net.kown.talkershighligth.config.Config;
 
@@ -19,14 +19,14 @@ import static net.kown.talkershighligth.logger.LoggerManager.addEntry;
  * </ul>
  * {@link ConcurrentHashMap} makes cross-thread access safe without explicit locking.
  */
-public final class TracerManager {
+public final class ActivityManager {
 
-    public static final TracerManager INSTANCE = new TracerManager();
+    public static final ActivityManager INSTANCE = new ActivityManager();
 
     /** UUID → active tracer.  May be written from the audio thread. */
-    private static final ConcurrentHashMap<UUID, TracerEntry> tracers = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, ActivityEntry> tracers = new ConcurrentHashMap<>();
 
-    private TracerManager() {}
+    private ActivityManager() {}
 
     // ── Called from SVC audio thread ──────────────────────────────────────────
 
@@ -39,13 +39,15 @@ public final class TracerManager {
      */
     public static void onPlayerTalking(UUID playerUUID, float amplitude) {
         Config cfg = Config.INSTANCE;
-        if (!cfg.TracerEnabled)             return;
-        if (amplitude < cfg.minVolume) return;
+        if (amplitude >= cfg.minVolume){
+            addEntry(playerUUID, amplitude);
+        }else return;
+
+        if (!cfg.TracerEnabled && !cfg.HighlightEnabled) return;
 
         tracers.compute(playerUUID, (uuid, existing) -> {
             if (existing == null) {
-                addEntry(uuid, amplitude);
-                return new TracerEntry(uuid, amplitude);
+                return new ActivityEntry(uuid, amplitude);
             }
             existing.onSoundReceived(amplitude);
             return existing;
@@ -65,11 +67,11 @@ public final class TracerManager {
      * @param onlineUUIDs  Set of UUIDs currently loaded in the client world.
      */
     public void tick(Set<UUID> onlineUUIDs) {
-        int persistMs = Config.INSTANCE.tracerPersistMs;
+        int persistMs = Config.INSTANCE.PersistanceMs;
 
         tracers.entrySet().removeIf(e -> {
             UUID uuid = e.getKey();
-            TracerEntry entry = e.getValue();
+            ActivityEntry entry = e.getValue();
 
             // Player left the world → remove immediately.
             if (!onlineUUIDs.contains(uuid)) return true;
@@ -86,7 +88,7 @@ public final class TracerManager {
     // ── Rendering read-path ───────────────────────────────────────────────────
 
     /** Snapshot of currently active tracers; safe to iterate on the render thread. */
-    public Collection<TracerEntry> getActiveTracers() {
+    public Collection<ActivityEntry> getActiveEntries() {
         return Collections.unmodifiableCollection(tracers.values());
     }
 

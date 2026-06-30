@@ -44,7 +44,7 @@ public class Config {
      * How long (ms) a tracer stays visible after the last audio packet
      * was received from that player.
      */
-    public int tracerPersistMs = 2000;
+    public int PersistanceMs = 2000;
 
     // ── Line appearance ───────────────────────────────────────────────────────
     /** Line thickness (pixels) at {@link #minVolume}. */
@@ -69,8 +69,8 @@ public class Config {
      * Logger list size
      * Logger auto save interval
      */
-    public int listSize = 10;
-    public int autosaveIntervalSeconds = 30;
+    public int listSize = 30;
+    public int autosaveIntervalSeconds = 120;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     public Color getLowVolumeColor()  { return new Color(lowVolumeColor,  true); }
