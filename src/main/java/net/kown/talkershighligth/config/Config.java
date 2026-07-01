@@ -38,8 +38,7 @@ public class Config {
      * tracer line is drawn for them.  Raise this to ignore quiet background
      * noise picked up by open-mic setups.
      */
-    public float minVolume = 0.05f;
-    //public float minVolume = 0.1f;
+    public float minVolume = 0.1f;
     /**
      * How long (ms) a tracer stays visible after the last audio packet
      * was received from that player.
