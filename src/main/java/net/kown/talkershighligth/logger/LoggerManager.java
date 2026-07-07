@@ -66,6 +66,12 @@ public final class LoggerManager {
      */
     public static synchronized void addEntry(UUID uuid, float value) {
         LogEntry entry = new LogEntry(System.currentTimeMillis(), uuid, value);
+        // Kick off name resolution the moment data arrives, not just when it's
+        // displayed. highestTable entries in particular can sit untouched for a
+        // long time after the player drops out of recentTable, so waiting until
+        // display time means the very first /THLogger loud for that player is
+        // guaranteed to show a raw UUID with no chance to self-correct.
+        LoggerNameCache.resolveAsync(uuid);
         updateRecentTable(entry);
         updateHighestTable(entry);
     }
