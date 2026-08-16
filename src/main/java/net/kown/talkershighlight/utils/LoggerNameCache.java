@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.utils;
+package net.kown.talkershighlight.utils;
 
 import java.util.Map;
 import java.util.Set;
@@ -7,16 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Caches UUID -> username lookups so NameUUIDSearch's blocking Mojang API
- * call only ever runs once per player, on a background thread, instead of
- * on the main thread or repeatedly for the same UUID.
- *
- * Usage pattern: call getDisplayName() wherever you're about to show or log
- * a name. It never blocks - it returns the cached name if known, otherwise
- * the raw UUID string as an immediate fallback, while quietly kicking off a
- * background resolution so future calls return the real name once it's in.
- */
+    // Caches UUID -> username lookups so NameUUIDSearch's blocking Mojang API
+    // runs once per player, on a background thread
+    // Usage pattern: call getDisplayName() => known = cached name or unknown = UUID
 public final class LoggerNameCache {
 
     private static final Map<UUID, String> cache = new ConcurrentHashMap<>();
@@ -30,10 +23,6 @@ public final class LoggerNameCache {
 
     private LoggerNameCache() {}
 
-    /**
-     * Best-known display name for a UUID, resolved or not. Never blocks.
-     * Falls back to the UUID's string form until/unless a lookup resolves.
-     */
     public static String getDisplayName(UUID uuid) {
         String cached = cache.get(uuid);
         if (cached != null) {
@@ -43,11 +32,7 @@ public final class LoggerNameCache {
         return uuid.toString();
     }
 
-    /**
-     * Kicks off a background lookup if this UUID hasn't been resolved (or
-     * isn't already being resolved). Safe to call repeatedly/concurrently -
-     * only ever schedules one in-flight lookup per UUID.
-     */
+    // start background UUID lookup if not been resolved
     public static void resolveAsync(UUID uuid) {
         if (cache.containsKey(uuid)) return;
         if (!inProgress.add(uuid)) return; // already in flight

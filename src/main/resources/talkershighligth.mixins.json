@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "net.kown.talkershighligth.mixin",
+	"package": "net.kown.talkershighlight.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ExampleMixin"

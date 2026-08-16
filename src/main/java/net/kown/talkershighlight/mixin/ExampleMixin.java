@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.mixin;
+package net.kown.talkershighlight.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;

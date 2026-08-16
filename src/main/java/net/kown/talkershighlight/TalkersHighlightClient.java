@@ -1,28 +1,28 @@
-package net.kown.talkershighligth;
+package net.kown.talkershighlight;
 
-import net.kown.talkershighligth.config.Config;
-import net.kown.talkershighligth.config.ConfigScreen;
-import net.kown.talkershighligth.logger.LoggerManager;
-import net.kown.talkershighligth.render.HighlightRenderer;
-import net.kown.talkershighligth.render.TracerRenderer;
-import net.kown.talkershighligth.manage.ActivityManager;
+import net.kown.talkershighlight.config.Config;
+import net.kown.talkershighlight.config.ConfigScreen;
+import net.kown.talkershighlight.logger.LoggerManager;
+import net.kown.talkershighlight.render.HighlightRenderer;
+import net.kown.talkershighlight.render.TracerRenderer;
+import net.kown.talkershighlight.manage.ActivityManager;
+import net.kown.talkershighlight.utils.HUDoverlay;
+import net.kown.talkershighlight.utils.LoggerCall;
+
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 
-import net.kown.talkershighligth.utils.HUDoverlay;
-import net.kown.talkershighligth.utils.LoggerCall;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,37 +34,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-
-/**
- * Client-side initialisation entry point.
- *
- * <h3>Responsibilities</h3>
- * <ul>
- *   <li>Load config from disk.</li>
- *   <li>Register the world-render hook (tracers).</li>
- *   <li>Register keybindings and their tick handlers.</li>
- *   <li>Drive {@link ActivityManager#tick} once per game tick.</li>
- * </ul>
- *
- * <h3>Keybindings (defaults)</h3>
- * <table>
- *   <tr><th>Key</th><th>Action</th></tr>
- *   <tr><td>J</td><td>Toggle tracer on/off (shows actionbar feedback)</td></tr>
- *   <tr><td>K</td><td>Open YACL config screen</td></tr>
- * </table>
- */
 public class TalkersHighlightClient implements ClientModInitializer {
 
     public static final String MOD_ID = "talkershighlight";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     private static ScheduledExecutorService autosaveExecutor;
 
-    /** Default J – toggle tracer overlay on/off. */
     public static KeyBinding toggleHighlightKey;
     public static KeyBinding toggleTracerKey;
-
-    /** Default K – open YACL config screen. */
     public static KeyBinding configKey;
 
     @Override
@@ -82,24 +59,24 @@ public class TalkersHighlightClient implements ClientModInitializer {
 
         // 3. Register keybindings ─────────────────────────────────────────────
         toggleTracerKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.talkershighligth.toggle_tracer",
+                "key.talkershighlight.toggle_tracer",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_J,
-                "category.talkershighligth"
+                "category.talkershighlight"
         ));
 
         toggleHighlightKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.talkershighligth.toggle_highlight",
+                "key.talkershighlight.toggle_highlight",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_H,
-                "category.talkershighligth"
+                "category.talkershighlight"
         ));
 
         configKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.voicechat_tracer.open_config",
+                "key.talkershighlight.open_config",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_K,
-                "category.voicechat_tracer"
+                "category.talkershighlight"
         ));
 
         // 4. Tick handler ──────────────────────────────────────────────────────
@@ -108,11 +85,7 @@ public class TalkersHighlightClient implements ClientModInitializer {
         LOGGER.info("[TH] Initialised. Press J to toggle, K for settings.");
 
 
-        // Prints the *actual* resolved path - check logs/latest.log for this
-        // line if files seem to be missing. This is the directory FabricLoader
-        // believes is the game dir for THIS launch, which can differ from a
-        // global .minecraft folder if you're using a per-instance launcher
-        // (Prism, MultiMC, CurseForge, ATLauncher, Modrinth App, etc).
+        // Prints the resolved path for logs .minecraft folder
         LOGGER.info("[THLogger] Writing logs to: {}",
                 FabricLoader.getInstance().getGameDir().resolve("thlogger").toAbsolutePath());
 

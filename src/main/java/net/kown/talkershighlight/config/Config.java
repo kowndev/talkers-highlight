@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.config;
+package net.kown.talkershighlight.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,65 +11,36 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * All user-facing settings for VoiceChat Tracer.
- * Values are stored as primitives so Gson can serialise them without adapters.
- * Use {@link #getLowVolumeColor()} / {@link #getHighVolumeColor()} to get
- * {@link java.awt.Color} objects for rendering.
- */
+    // Values are stored as primitives so Gson can serialise them without adapters.
 public class Config {
 
-    // ── Singleton ─────────────────────────────────────────────────────────────
     public static Config INSTANCE = new Config();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("talkershighligth/config");
+    private static final Logger LOGGER = LoggerFactory.getLogger("talkershighlight/config");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_FILE =
-            FabricLoader.getInstance().getConfigDir().resolve("talkershighligth.json");
+            FabricLoader.getInstance().getConfigDir().resolve("talkershighlight.json");
 
-    // ── General ───────────────────────────────────────────────────────────────
-    /** Master on/off switch for the overlay. */
     public boolean TracerEnabled = true;
     public boolean HighlightEnabled = false;
 
-    // ── Activation thresholds ─────────────────────────────────────────────────
-    /**
-     * Normalised amplitude [0.0 – 1.0] that a player must exceed before a
-     * tracer line is drawn for them.  Raise this to ignore quiet background
-     * noise picked up by open-mic setups.
-     */
     public float minVolume = 0.1f;
-    /**
-     * How long (ms) a tracer stays visible after the last audio packet
-     * was received from that player.
-     */
     public int PersistanceMs = 2000;
 
-    // ── Line appearance ───────────────────────────────────────────────────────
-    /** Line thickness (pixels) at {@link #minVolume}. */
+    // in pixels
     public float minLineWidth = 1.0f;
-
-    /** Line thickness (pixels) at maximum detected amplitude. */
     public float maxLineWidth = 3.5f;
 
-    /**
-     * ARGB integer for the "quiet" end of the colour gradient.
-     * Default: semi-transparent green.
-     */
     public int lowVolumeColor = new Color(0, 230, 0, 220).getRGB();
-
-    /**
-     * ARGB integer for the "loud" end of the colour gradient.
-     * Default: semi-transparent red.
-     */
     public int highVolumeColor = new Color(230, 0, 0, 220).getRGB();
 
-    /**
-     * Logger list size
-     * Logger auto save interval
-     */
+    //Logger list size & auto save interval
     public int listSize = 30;
     public int autosaveIntervalSeconds = 120;
+
+    //sensitivity
+    public double gamma = 0;
+    public int sense = 0;
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     public Color getLowVolumeColor()  { return new Color(lowVolumeColor,  true); }

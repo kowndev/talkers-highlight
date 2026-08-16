@@ -1,6 +1,6 @@
-package net.kown.talkershighligth.manage;
+package net.kown.talkershighlight.manage;
 
-import net.kown.talkershighligth.config.Config;
+import net.kown.talkershighlight.config.Config;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,64 +8,48 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static net.kown.talkershighligth.logger.LoggerManager.addEntry;
+import static net.kown.talkershighlight.logger.LoggerManager.addEntry;
 
-/**
- * Central registry of active tracer entries.
- *
- * <ul>
- *   <li>{@link #onPlayerTalking} is called from the audio thread (via SVC).</li>
- *   <li>{@link #tick} is called from the main game thread each client tick.</li>
- * </ul>
- * {@link ConcurrentHashMap} makes cross-thread access safe without explicit locking.
- */
 public final class ActivityManager {
 
     public static final ActivityManager INSTANCE = new ActivityManager();
 
-    /** UUID → active tracer.  May be written from the audio thread. */
+    private static final float MAX_AMPLITUDE = 0.375f;
+
+    // UUID → active tracer
     private static final ConcurrentHashMap<UUID, ActivityEntry> tracers = new ConcurrentHashMap<>();
 
     private ActivityManager() {}
 
-    // ── Called from SVC audio thread ──────────────────────────────────────────
-
-    /**
-     * Registers or refreshes a tracer for {@code playerUUID}.
-     *
-     * @param playerUUID  UUID of the talking player.
-     * @param amplitude   Normalised amplitude [0.0 – 1.0].
-     *                    Use {@code 1.0f} if SVC does not expose raw amplitude.
-     */
+    // Called from SVC audio thread
     public static void onPlayerTalking(UUID playerUUID, float amplitude) {
         Config cfg = Config.INSTANCE;
         if (amplitude >= cfg.minVolume){
             addEntry(playerUUID, amplitude);
         }else return;
 
+        float sensitivity = cfg.sense / 10f; // 0.0 at floor<=1, 1.0 at floor=10
+        float noise_floor = MAX_AMPLITUDE * (1f - sensitivity);
+        float range = Math.max(0.0001f, MAX_AMPLITUDE - noise_floor);
+
+        float normalized = (amplitude - noise_floor) / range;
+        float boostedAmplitude = Math.max(0f, Math.min(1f, normalized)); // no curve — linear
+
+        // feed boostedAmplitude (0 = green, 1 = red) into your color interpolation
+
         if (!cfg.TracerEnabled && !cfg.HighlightEnabled) return;
 
         tracers.compute(playerUUID, (uuid, existing) -> {
             if (existing == null) {
-                return new ActivityEntry(uuid, amplitude);
+                return new ActivityEntry(uuid, boostedAmplitude);
             }
-            existing.onSoundReceived(amplitude);
+            existing.onSoundReceived(boostedAmplitude);
             return existing;
         });
     }
 
-    // ── Called from main game thread (ClientTickEvents) ───────────────────────
-
-    /**
-     * Performs per-tick housekeeping:
-     * <ol>
-     *   <li>Removes entries whose player has left the world.</li>
-     *   <li>Removes entries whose persist-timer has elapsed.</li>
-     *   <li>Decays the smoothed amplitude of remaining entries.</li>
-     * </ol>
-     *
-     * @param onlineUUIDs  Set of UUIDs currently loaded in the client world.
-     */
+    // Called from main game thread (ClientTickEvents)
+    // Performs per-tick housekeeping:
     public void tick(Set<UUID> onlineUUIDs) {
         int persistMs = Config.INSTANCE.PersistanceMs;
 
@@ -87,12 +71,12 @@ public final class ActivityManager {
 
     // ── Rendering read-path ───────────────────────────────────────────────────
 
-    /** Snapshot of currently active tracers; safe to iterate on the render thread. */
+    // Snapshot of currently active tracers; safe to iterate on the render thread.
     public Collection<ActivityEntry> getActiveEntries() {
         return Collections.unmodifiableCollection(tracers.values());
     }
 
-    /** Clears all tracers (e.g., when leaving a world). */
+    // Clears all tracers (e.g., when leaving a world).
     public void clear() {
         tracers.clear();
     }

@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.utils;
+package net.kown.talkershighlight.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -13,9 +13,6 @@ public class NameUUIDSearch {
 
     public static String id(UUID uuid) {
         try {
-            // Remove dashes if present
-            //uuid = uuid.replace("-", "");
-
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");

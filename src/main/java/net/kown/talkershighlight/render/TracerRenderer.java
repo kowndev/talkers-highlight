@@ -1,9 +1,9 @@
-package net.kown.talkershighligth.render;
+package net.kown.talkershighlight.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.kown.talkershighligth.config.Config;
-import net.kown.talkershighligth.manage.ActivityEntry;
-import net.kown.talkershighligth.manage.ActivityManager;
+import net.kown.talkershighlight.config.Config;
+import net.kown.talkershighlight.manage.ActivityEntry;
+import net.kown.talkershighlight.manage.ActivityManager;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 

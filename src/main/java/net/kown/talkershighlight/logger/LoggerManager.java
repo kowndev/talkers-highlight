@@ -1,8 +1,8 @@
-package net.kown.talkershighligth.logger;
+package net.kown.talkershighlight.logger;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.kown.talkershighligth.config.Config;
-import net.kown.talkershighligth.utils.LoggerNameCache;
+import net.kown.talkershighlight.config.Config;
+import net.kown.talkershighlight.utils.LoggerNameCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,31 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Holds two separate rolling tables so "most recent" and "personal best"
- * don't fight over the same slot:
- *
- *  - recentTable:  one entry per player, always their latest submission.
- *                  Capped at listSize; oldest (by time) evicted first.
- *  - highestTable: one entry per player, only replaced if the new value
- *                  beats or ties their existing entry IN THIS TABLE (ties
- *                  go to the newer submission). Capped at listSize; lowest
- *                  value evicted first when full, oldest first on a tie.
- *
- * Entries store only time/UUID/value - usernames are resolved lazily via
- * THLoggerNameCache only when something is actually displayed or logged.
- *
- * Two kinds of file writes:
- *  - writeAutosave(): periodic safety-net snapshot, overwrites one stable
- *    filename every call. Not an archive - just "best known state."
- *  - writeFinalLog(): called when a session ends (world disconnect, or a
- *    backup trigger like client stopping / shutdown hook). Filename is
- *    timestamped so multiple disconnects in the same client run each get
- *    their own file instead of clobbering each other.
- *
- * All access is synchronized since data may arrive on a network/event
- * thread while commands and the autosave/exit writer read it elsewhere.
- */
 public final class LoggerManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("THLogger");
@@ -59,18 +34,8 @@ public final class LoggerManager {
 
     private LoggerManager() {}
 
-    /**
-     * Call this from your other code segment whenever new data arrives.
-     * Time is stamped at the moment of receipt. No username lookup happens
-     * here - that's deferred until display/log time.
-     */
     public static synchronized void addEntry(UUID uuid, float value) {
         LogEntry entry = new LogEntry(System.currentTimeMillis(), uuid, value);
-        // Kick off name resolution the moment data arrives, not just when it's
-        // displayed. highestTable entries in particular can sit untouched for a
-        // long time after the player drops out of recentTable, so waiting until
-        // display time means the very first /THLogger loud for that player is
-        // guaranteed to show a raw UUID with no chance to self-correct.
         LoggerNameCache.resolveAsync(uuid);
         updateRecentTable(entry);
         updateHighestTable(entry);
@@ -117,14 +82,14 @@ public final class LoggerManager {
         }
     }
 
-    /** Backing data for /THLogger latest. */
+    // Backing data for /THLogger latest
     public static synchronized List<LogEntry> getLatestSortedByTimeDesc() {
         List<LogEntry> copy = new ArrayList<>(recentTable);
         copy.sort(Comparator.comparingLong(LogEntry::time).reversed());
         return copy;
     }
 
-    /** Backing data for /THLogger loud. */
+    // Backing data for /THLogger loud
     public static synchronized List<LogEntry> getHighestSortedByValueDesc() {
         List<LogEntry> copy = new ArrayList<>(highestTable);
         copy.sort(Comparator.comparingDouble(LogEntry::value).reversed());
@@ -136,26 +101,20 @@ public final class LoggerManager {
         highestTable.clear();
     }
 
-    /**
-     * Periodic safety-net snapshot. Always overwrites the same filename -
-     * intentionally not timestamped, since it's meant to reflect "current
-     * state" in case of an abrupt termination, not a historical record.
-     */
     public static synchronized void writeAutosave() {
         Path logDir = FabricLoader.getInstance().getGameDir().resolve("thlogger");
         writeMergedTo(logDir.resolve("thlogger_autosave.txt"));
     }
 
-    /**
-     * Final flush for a session (world disconnect, or a backup trigger).
-     * Timestamped filename so it never overwrites a previous session's log.
-     */
+     // Final flush for a session (world disconnect, or a backup trigger).
+     // Timestamped filename so it never overwrites a previous session's log.
     public static synchronized void writeFinalLog() {
         Path logDir = FabricLoader.getInstance().getGameDir().resolve("thlogger");
         String stamp = Instant.now().atZone(ZoneId.systemDefault()).format(FILENAME_FORMAT);
         writeMergedTo(logDir.resolve("thlogger_log_" + stamp + ".txt"));
     }
 
+    // merge recent and latest table to txt file
     private static void writeMergedTo(Path logFile) {
         List<LogEntry> merged = new ArrayList<>(recentTable.size() + highestTable.size());
         merged.addAll(recentTable);
@@ -164,7 +123,6 @@ public final class LoggerManager {
             LOGGER.info("[THLogger] Skipping write to {} - no entries collected yet.", logFile.toAbsolutePath());
             return;
         }
-
         merged.sort(Comparator.comparingLong(LogEntry::time).reversed());
 
         try {

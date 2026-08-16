@@ -1,7 +1,7 @@
-package net.kown.talkershighligth.bridge;
+package net.kown.talkershighlight.bridge;
 
-import net.kown.talkershighligth.TalkersHighlightClient;
-import net.kown.talkershighligth.manage.ActivityManager;
+import net.kown.talkershighlight.TalkersHighlightClient;
+import net.kown.talkershighlight.manage.ActivityManager;
 
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
@@ -35,26 +35,13 @@ public class VoiceChatPluginV1 implements VoicechatPlugin{
         if (playerUUID == null) return;
         ActivityManager.INSTANCE.onPlayerTalking(playerUUID,
                 calculateAudioLevel(event.getRawAudio()));
-        // ─────────────────────────────────────────────────────────────────────
+
         // Amplitude placeholder: 1.0f = "definitely talking".
-        // The smoothed decay in ActivityEntry will create a natural fade once
-        // events stop arriving, giving the impression of a pulsing signal.
-        //
-        // To use real amplitude (if your SVC build supports it):
-        //   float amplitude = event.getAmplitude();          // hypothetical
-        //   ActivityManager.INSTANCE.onPlayerTalking(playerUUID, amplitude);
-        // ─────────────────────────────────────────────────────────────────────
-        //ActivityManager.INSTANCE.onPlayerTalking(playerUUID, 1.0f);
+
 
     }
 
-    /**
-     * Extracts the speaker's UUID from the event.
-     *
-     * <p>SVC API method naming has varied across releases.  The chains below
-     * cover the most common patterns – uncomment the one that compiles for
-     * your specific {@code voicechat-api} version.
-     */
+    // Extracts the speaker's UUID from the event.
     private UUID resolveUUID(ClientReceiveSoundEvent event) {
         try {
 
@@ -63,7 +50,6 @@ public class VoiceChatPluginV1 implements VoicechatPlugin{
 
             // ── Pattern B – some older 2.4.x builds ──────────────────────────
             //return event.getConnection().getPlayer().getId();
-
 
             // ── Pattern C – alternative naming ───────────────────────────────
             // return event.getPlayer().getUUID();

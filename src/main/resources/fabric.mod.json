@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "talkershighligth",
+	"id": "talkershighlight",
 	"version": "${version}",
-	"name": "Talker's Highligth",
+	"name": "Talker's Highlight",
 	"description": "Client Side Simple Voice Chat Addon, that make it more clearer who is talking",
 	"authors": [
 		"KownDev"
@@ -20,23 +20,20 @@
       }
     },
 	"license": "CC-BY-ND 4.0",
-	"icon": "assets/talkershighligth/icon.png",
+	"icon": "assets/talkershighlight/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"net.kown.talkershighligth.TalkersHighligth"
-		],
 		"fabric-datagen": [
-			"net.kown.talkershighligth.TalkersHighligthDataGenerator"
+			"net.kown.talkershighlight.TalkersHighligthDataGenerator"
 		],
         "client": [
-          "net.kown.talkershighligth.TalkersHighlightClient"
+          "net.kown.talkershighlight.TalkersHighlightClient"
         ],
         "modmenu": [
-          "net.kown.talkershighligth.ModMenuApiImpl"
+          "net.kown.talkershighlight.ModMenuApiImpl"
         ],
         "voicechat": [
-          "net.kown.talkershighligth.bridge.VoiceChatPluginV1"
+          "net.kown.talkershighlight.bridge.VoiceChatPluginV1"
         ]
 	},
 	"mixins": [

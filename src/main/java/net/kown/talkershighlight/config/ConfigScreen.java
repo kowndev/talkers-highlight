@@ -1,4 +1,4 @@
-package net.kown.talkershighligth.config;
+package net.kown.talkershighlight.config;
 
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.*;
@@ -7,22 +7,10 @@ import net.minecraft.text.Text;
 
 import java.awt.Color;
 
-/**
- * Builds the YACL-powered settings screen.
- *
- * <p>Called both from the in-game keybind ({@code K}) and, if Mod Menu is
- * installed, from its "Config" button.
- */
 public final class ConfigScreen {
 
     private ConfigScreen() {}
 
-    /**
-     * Creates and returns the config screen.
-     *
-     * @param parent  The screen to return to when the user closes config.
-     *                May be {@code null} (YACL handles it gracefully).
-     */
     public static Screen createScreen(Screen parent) {
         Config cfg = Config.INSTANCE;
 
@@ -80,8 +68,7 @@ public final class ConfigScreen {
                                                 + "a tracer is drawn.  Raise this to suppress open-mic noise.")))
                                 .binding(0.05f, () -> cfg.minVolume, v -> cfg.minVolume = v)
                                 .controller(opt -> FloatSliderControllerBuilder.create(opt)
-                                        .range(0.00f, 1.00f)
-                                        .step(0.01f)
+                                        .range(0.00f, 1.00f).step(0.01f)
                                         .formatValue(v -> Text.literal(String.format("%.2f", v))))
                                 .build())
 
@@ -93,9 +80,21 @@ public final class ConfigScreen {
                                                 + "voice-activation (push-to-talk gaps).")))
                                 .binding(2000, () -> cfg.PersistanceMs, v -> cfg.PersistanceMs = v)
                                 .controller(opt -> IntegerSliderControllerBuilder.create(opt)
-                                        .range(100, 10_000)
-                                        .step(100)
+                                        .range(100, 10_000).step(100)
                                         .formatValue(v -> Text.literal(v + " ms")))
+                                .build())
+
+                        .option(Option.<Integer>createBuilder()
+                                .name(Text.literal("Tracer Sensitivity"))
+                                .description(OptionDescription.of(
+                                        Text.literal(
+                                                "Controls how strongly the tracer reacts when someone is actually talking.\n"
+                                                        + "Higher = talking makes the line jump to full thickness clearly, easier to spot at a glance.\n"
+                                                        + "Lower = a more subtle, natural-looking response.\n"
+                                        )))
+                                .binding(5, () -> cfg.sense, v -> cfg.sense = v)
+                                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                                        .range(0, 10).step(1))
                                 .build())
 
                         .build())

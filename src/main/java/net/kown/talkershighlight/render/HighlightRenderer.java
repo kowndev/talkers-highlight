@@ -1,9 +1,9 @@
-package net.kown.talkershighligth.render;
+package net.kown.talkershighlight.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.kown.talkershighligth.config.Config;
-import net.kown.talkershighligth.manage.ActivityEntry;
-import net.kown.talkershighligth.manage.ActivityManager;
+import net.kown.talkershighlight.config.Config;
+import net.kown.talkershighlight.manage.ActivityEntry;
+import net.kown.talkershighlight.manage.ActivityManager;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 
@@ -18,15 +18,8 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.UUID;
 
-/**
- * Draws a wireframe (non-filled) box outline around any player currently
- * registered in {@link ActivityManager} — i.e. anyone talking, or
- * fading out after talking. Purely a visual indicator: it traces the
- * player's hitbox edges only, it never covers/fills the model.
- *
- * Colour and thickness are driven by the same smoothed amplitude used by
- * {@link TracerRenderer}, so both effects move together.
- */
+    //Draws a wireframe box outline around any player currently registered in ActivityManager
+
 public final class HighlightRenderer {
 
     private HighlightRenderer() {}
@@ -75,27 +68,16 @@ public final class HighlightRenderer {
             float[] c = lerpColor(config, amplitude);
             float outlineWidth = lerpF(config.minLineWidth, config.maxLineWidth, amplitude);
 
-            // Slightly inflate the hitbox so the outline doesn't z-fight with
-            // the skin/armor model.
+            // Slightly inflate the hitbox so no z-fight with the skin/armor model.
             Box box = player.getBoundingBox().expand(0.02);
 
-            // lineWidth is GL state read at draw-call time, not at vertex-emit
-            // time. Since each player can have a different amplitude (and
-            // therefore a different width), we flush per-player rather than
-            // batching everyone into one draw call — otherwise only the last
-            // player's width would apply to every box drawn this frame.
+            // lineWidth is GL state read at draw-call time, not at vertex-emit time.
+            // Since each player can have a different amplitude
+            // flush per-player
             RenderSystem.lineWidth(outlineWidth);
             VertexConsumer lines = provider.getBuffer(RenderLayer.LINES);
 
             drawBoxOutline(matrices, lines, box, c);
-
-            // Flush the LINES layer specifically — NOT drawCurrentLayer(),
-            // which flushes whatever RenderLayer was last requested ANYWHERE
-            // in the frame (including by other mods, e.g. a talking-bubbles
-            // overlay that buffers a textured quad via the same shared
-            // Immediate provider). Using drawCurrentLayer() here could flush
-            // someone else's buffered geometry instead of ours, producing
-            // stray textured quads instead of our line boxes.
             provider.draw(RenderLayer.LINES);
         }
 
@@ -105,11 +87,10 @@ public final class HighlightRenderer {
         RenderSystem.disableBlend();
     }
 
-    /**
-     * Emits the 12 edges of an axis-aligned box as GL lines (RenderLayer.LINES
-     * expects line *segments*, so each edge is its own vertex pair — no
-     * shared-vertex line-strip trickery needed).
-     */
+     // Emits the 12 edges of an axis-aligned box as GL lines
+     // RenderLayer.LINES expects line segments
+     // each edge is its own vertex pair
+     // no shared-vertex line-strip
     private static void drawBoxOutline(MatrixStack matrices, VertexConsumer buffer, Box box, float[] c) {
         var posMatrix = matrices.peek().getPositionMatrix();
         var entry = matrices.peek();
@@ -144,8 +125,8 @@ public final class HighlightRenderer {
             float x1, float y1, float z1,
             float x2, float y2, float z2
     ) {
-        // Normal points along the edge direction; for thin unlit lines this
-        // is sufficient — RenderLayer.LINES does not depend on it for shading.
+        // Normal points along the edge direction
+        // RenderLayer.LINES does not depend on it for shading
         float nx = x2 - x1, ny = y2 - y1, nz = z2 - z1;
         float len = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
         if (len > 1e-6f) { nx /= len; ny /= len; nz /= len; }

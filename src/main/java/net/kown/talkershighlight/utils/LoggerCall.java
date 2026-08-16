@@ -1,11 +1,11 @@
-package net.kown.talkershighligth.utils;
+package net.kown.talkershighlight.utils;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.kown.talkershighligth.logger.LogEntry;
-import net.kown.talkershighligth.logger.LoggerManager;
+import net.kown.talkershighlight.logger.LogEntry;
+import net.kown.talkershighlight.logger.LoggerManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
